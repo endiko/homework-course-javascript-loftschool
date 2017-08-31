@@ -9,26 +9,27 @@
  - fn не является функцией (с текстом "fn is not a function")
  Зарпещено использовать встроенные методы для работы с массивами
  */
-function isAllTrue(array, fn) {
-    var res = fn(array) ? true : false;
-    return res; 
-}
 
-function fn(arr) {
-    var newArr = [];
-    for (var i = 0; i < arr.length; i++) {
-        if (arr[i] !== '' || arr[i] !== underfind) {
-            return true;
-        } else {
-            try {
-                
-            } catch (error) {
-                
-            }
+const ERROR_1 = 'empty array';
+const ERROR_2 = 'fn is not a function'
+
+function isAllTrue(array, fn) {
+
+    if (!Array.isArray(array) || array.length === 0) {
+        throw new Error(ERROR_1);
+    } else if (typeof fn !== 'function') {
+        throw new Error(ERROR_2);
+    }
+
+    for (var i = 0; i < array.length; i++) {
+        if (!fn(array[i])) {
+            return false;
         }
     }
-}
 
+    return true;
+
+}
 
 /*
  Задача 2:
@@ -40,6 +41,20 @@ function fn(arr) {
  Зарпещено использовать встроенные методы для работы с массивами
  */
 function isSomeTrue(array, fn) {
+
+    if (!Array.isArray(array) || array.length === 0) {
+        throw new Error(ERROR_1);
+    } else if (typeof fn !== 'function') {
+        throw new Error(ERROR_2);
+    }
+    
+    for (var i = 0; i < array.length; i++) {
+        if (fn(array[i])) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /*
@@ -50,7 +65,24 @@ function isSomeTrue(array, fn) {
  Необходимо выбрасывать исключение в случаях:
  - fn не является функцией (с текстом "fn is not a function")
  */
+
 function returnBadArguments(fn) {
+
+    if (typeof fn !== 'function') {
+        throw new Error(ERROR_2);
+    } 
+
+    var arr = [];
+
+    for (let i = 1; i < arguments.length; i++) {
+        try {
+            fn(arguments[i]);
+        } catch (e) {
+            arr.push(arguments[i]);
+        }
+    }
+
+    return arr;
 }
 
 /*
@@ -67,7 +99,59 @@ function returnBadArguments(fn) {
  - number не является числом (с текстом "number is not a number")
  - какой-либо из аргументов div является нулем (с текстом "division by 0")
  */
-function calculator() {
+function calculator(number) {
+    if (number === undefined) {
+        number = 0;
+    }
+
+    if (typeof number !== 'number') {
+        throw new Error('number is not a number');
+    }
+
+    var calcObj = {
+        sum: function () {
+            let res = 0;
+
+            for (let i = 0; i < arguments.length; i++) {
+                res += arguments[i];
+            }
+
+            return number + res;
+        },
+
+        dif: function () {
+            let res = 0;
+
+            for (let i = 0; i < arguments.length; i++) {
+                res += arguments[i];
+            }
+            
+            return number - res;
+        },
+
+        div: function () {
+            for (let i = 0; i < arguments.length; i++) {
+                if (arguments[i] !== 0) {
+                    number /= arguments[i];
+                } else {
+                    throw new Error ('division by 0');
+                }
+            }
+            
+            return number;
+        },
+
+        mul: function () {
+            for (let i = 0; i < arguments.length; i++) {
+                number *= arguments[i];                
+            }
+
+            return number;
+            
+        }
+    };
+
+    return calcObj;
 }
 
 export {
