@@ -79,6 +79,7 @@ function hasProperty(obj, prop) {
  Функция должна получить все перечисляемые свойства объекта и вернуть их в виде массива
  */
 function getEnumProps(obj) {
+    return Object.keys(obj);
 }
 
 /*
@@ -86,6 +87,13 @@ function getEnumProps(obj) {
  Функция должна перебрать все свойства объекта, преобразовать их имена в верхний регистра и вернуть в виде массива
  */
 function upperProps(obj) {
+    var arr = Object.getOwnPropertyNames(obj);
+
+    for (var i = 0; i < arr.length; i++) {
+        arr[i] = arr[i].toUpperCase();
+    }
+
+    return arr;
 }
 
 /*
