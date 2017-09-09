@@ -1,81 +1,69 @@
-/* ДЗ 1 - Функции */
+/* ДЗ 5 - DOM Events */
 
-/*
- Задание 1:
-
- Функция должна принимать один аргумент и возвращать его
+/**
+ * Функция должна добавлять обработчик fn события eventName к элементу target
+ *
+ * @param {string} eventName - имя события, на которое нужно добавить обработчик
+ * @param {Element} target - элемент, на который нужно добавить обработчик
+ * @param {function} fn - обработчик
  */
-function returnFirstArgument(arg) {
-    return arg;
+function addListener(eventName, target, fn) {
 }
 
-/*
- Задание 2:
-
- Функция должна принимать два аргумента и возвращать сумму переданных значений
- Значение по умолчанию второго аргумента должно быть 100
+/**
+ * Функция должна удалять обработчик fn события eventName у элемента target
+ *
+ * @param {string} eventName - имя события, для которого нужно удалить обработчик
+ * @param {Element} target - элемент, у которого нужно удалить обработчик
+ * @param {function} fn - обработчик
  */
-function defaultParameterValue(a, b = 100) {
-  //  return a + ((b !== undefined) ? b : 100); 
-    return a + b;
+function removeListener(eventName, target, fn) {
 }
 
-/*
- Задание 3:
-
- Функция должна возвращать все переданные в нее аргументы в виде массива
- Количество переданных аргументов заранее неизвестно
+/**
+ * Функция должна добавлять к target обработчик события eventName, который должен отменять действие по умолчанию
+ *
+ * @param {string} eventName - имя события, для которого нужно удалить обработчик
+ * @param {Element} target - элемент, на который нужно добавить обработчик
  */
-function returnArgumentsArray() {
-    var res = [];
-
-    for (var i = 0; i < arguments.length; i++) {
-        res[i] = arguments[i];
-    }
-
-    return res;
-
+function skipDefault(eventName, target) {
 }
 
-/*
- Задание 4:
-
- Функция должна принимать другую функцию и возвращать результат вызова переданной функции
+/**
+ * Функция должна эмулировать событие click для элемента target
+ *
+ * @param {Element} target - элемент, на который нужно добавить обработчик
  */
-function returnFnResult(fn) {
-    return fn();
+function emulateClick(target) {
 }
 
-/*
- Задание 5:
-
- Функция должна принимать число (значение по умолчанию - 0) и возвращать функцию (F)
- При вызове F, переданное число должно быть увеличено на единицу и возвращено из F
+/**
+ * Функция должна добавить такой обработчик кликов к элементу target
+ * который реагирует (вызывает fn) только на клики по элементам BUTTON внутри target
+ *
+ * @param {Element} target - элемент, на который нужно добавить обработчик
+ * @param {function} fn - функция, которую нужно вызвать при клике на элемент BUTTON внутри target
  */
-function returnCounter(a = 0) {
-
-    var func = function () {
-        return ++a;
-    }
-
-    return func;
+function delegate(target, fn) {
 }
 
-/*
- Задание 6 *:
-
- Функция должна принимать другую функцию (F) и некоторое количество дополнительных аргументов
- Функция должна привязать переданные аргументы к функции F и вернуть получившуюся функцию
+/**
+ * *** Со звездочкой ***
+ * Функция должна добавить такой обработчик кликов к элементу target
+ * который сработает только один раз и удалится
+ * Постарайтесь не создавать глобальных переменных
+ *
+ * @param {Element} target - элемент, на который нужно добавить обработчик
+ * @param {function} fn - обработчик
  */
-function bindFunction(fn, ...theArgs) {
-    return fn.bind(null, ...theArgs);
+function once(target, fn) {
 }
 
 export {
-    returnFirstArgument,
-    defaultParameterValue,
-    returnArgumentsArray,
-    returnFnResult,
-    returnCounter,
-    bindFunction
-}
+    addListener,
+    removeListener,
+    skipDefault,
+    emulateClick,
+    delegate,
+    once
+};
