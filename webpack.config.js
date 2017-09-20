@@ -16,10 +16,10 @@ loaders.push({
 module.exports = {
     entry: {
         main: './src/index.js',
-        townss: './src/towns.js'
+        towns: './src/towns.js'
     },
     output: {
-        filename: '[hash].js',
+        filename: '[name].[hash].js',
         path: path.resolve('dist')
     },
     devtool: 'source-map',
@@ -40,7 +40,7 @@ module.exports = {
             chunks: ['main']
         }),
         new HtmlPlugin({
-            title: 'Div Drag And Drop',
+            title: 'Towns filter',
             template: 'towns.hbs',
             filename: 'towns.html',
             chunks: ['towns']

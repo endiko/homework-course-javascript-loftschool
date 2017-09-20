@@ -73,7 +73,7 @@ function loadTowns() {
  * @return {boolean}
  */
 function isMatching(full, chunk) {
-    return (full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1);     
+    return (full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1); 
 }
 
 let loadingBlock = homeworkContainer.querySelector('#loading-block');
@@ -82,9 +82,30 @@ let filterInput = homeworkContainer.querySelector('#filter-input');
 let filterResult = homeworkContainer.querySelector('#filter-result');
 let townsPromise;
 
+window.addEventListener('load', function(){
+    loadTowns().then(() => {
+        filterBlock.style.display = 'block';
+        loadingBlock.style.display = 'none';
+    })
+});
+
 filterInput.addEventListener('keyup', function() {
-    loadTowns();
-    
+    loadTowns().then(list => {
+        let arr = [];
+        let res;
+
+        list.forEach((town) => {
+            arr.push(`${town.name}`);
+        })
+
+        if (filterInput.value === '') {
+            res = '';
+        } else {
+            res = arr.filter(isMatching);
+        }
+
+        filterResult.innerText = res;
+    })   
 });
 
 export {
