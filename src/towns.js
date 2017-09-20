@@ -80,17 +80,17 @@ let loadingBlock = homeworkContainer.querySelector('#loading-block');
 let filterBlock = homeworkContainer.querySelector('#filter-block');
 let filterInput = homeworkContainer.querySelector('#filter-input');
 let filterResult = homeworkContainer.querySelector('#filter-result');
-let townsPromise;
+let townsPromise = loadTowns();
 
 window.addEventListener('load', function(){
-    loadTowns().then(() => {
+    townsPromise.then(() => {
         filterBlock.style.display = 'block';
         loadingBlock.style.display = 'none';
     })
 });
 
 filterInput.addEventListener('keyup', function() {
-    loadTowns().then(list => {
+    townsPromise.then(list => {
         let arr = [];
         let res;
 
@@ -99,14 +99,19 @@ filterInput.addEventListener('keyup', function() {
         })
 
         if (filterInput.value === '') {
-            res = '';
+            filterResult.innerText = '';
         } else {
             res = arr.filter(item => {
                 return isMatching(item, filterInput.value)
             });
+
+            for (let i = 0; i < res.length; i++) {
+                let elem = document.createElement('div');
+
+                elem.innerText = res[i];
+                filterResult.appendChild(elem);
+            }
         }
-        
-        filterResult.innerText = res;
     })   
 });
 
