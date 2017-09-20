@@ -101,9 +101,11 @@ filterInput.addEventListener('keyup', function() {
         if (filterInput.value === '') {
             res = '';
         } else {
-            res = arr.filter(isMatching);
+            res = arr.filter(item => {
+                return isMatching(item, filterInput.value)
+            });
         }
-
+        
         filterResult.innerText = res;
     })   
 });
