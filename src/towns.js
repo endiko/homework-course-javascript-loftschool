@@ -95,11 +95,11 @@ window.addEventListener('load', () => {
     townsPromise.then(() => {
         filterBlock.style.display = 'block';
         loadingBlock.style.display = 'none';
-        //console.log('success - window load');
+
     }, () => {
         loadingBlock.innerText = 'Не удалось загрузить города';
         reloadBtn.style.display = 'block';
-        //console.log('error - window load');
+
     })
 });
 
@@ -108,11 +108,11 @@ reloadBtn.addEventListener('click', () => {
         filterBlock.style.display = 'block';
         loadingBlock.style.display = 'none';
         reloadBtn.style.display = 'none';
-       // console.log('success - reload from btn');
+
     }, () => {
         loadingBlock.innerText = 'Не удалось загрузить города';
         reloadBtn.style.display = 'block';
-        //console.log('error - reload from btn');
+
     })
 })
 
@@ -120,6 +120,8 @@ filterInput.addEventListener('keyup', function() {
     townsPromise.then(list => {
         let arr = [];
         let res;
+
+        filterResult.innerHTML = '';
 
         list.forEach((town) => {
             arr.push(`${town.name}`);
@@ -129,7 +131,7 @@ filterInput.addEventListener('keyup', function() {
             filterResult.innerText = '';
         } else {
             res = arr.filter(item => {
-                return isMatching(item, filterInput.value)
+                return isMatching(item, filterInput.value);
             });
 
             for (let i = 0; i < res.length; i++) {
