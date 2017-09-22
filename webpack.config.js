@@ -4,6 +4,7 @@ let CleanWebpackPlugin = require('clean-webpack-plugin');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 let loaders = require('./webpack.config.loaders')();
 let path = require('path');
+//let handlebars = require('handlebars');
 
 loaders.push({
     test: /\.css$/,
@@ -14,14 +15,22 @@ loaders.push({
 });
 
 module.exports = {
-    entry: './src/index.js',
+    entry: {
+        main: './src/index.js',
+        friendsfilter: './src/ff.js'
+    },
     output: {
         filename: '[name].[hash].js',
         path: path.resolve('dist')
     },
     devtool: 'source-map',
     module: {
-        loaders
+        loaders: [
+            {
+                test: /\.hbs$/, 
+                loader: 'handlebars-loader'
+            }
+        ]
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
@@ -32,8 +41,14 @@ module.exports = {
         }),
         new ExtractTextPlugin('styles.css'),
         new HtmlPlugin({
-            title: 'Loft School sample project',
-            template: 'index.hbs'
+            title: 'main',
+            template: 'index.hbs',
+            chunks: ['main']
+        }),
+        new HtmlPlugin({
+            title: 'Другофильтр',
+            template: 'friendsfilter.hbs',
+            chunks: ['friendsfilter']
         }),
         new CleanWebpackPlugin(['dist'])
     ]
