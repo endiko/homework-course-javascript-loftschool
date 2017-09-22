@@ -4,7 +4,6 @@ let CleanWebpackPlugin = require('clean-webpack-plugin');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 let loaders = require('./webpack.config.loaders')();
 let path = require('path');
-//let handlebars = require('handlebars');
 
 loaders.push({
     test: /\.css$/,
@@ -15,41 +14,30 @@ loaders.push({
 });
 
 module.exports = {
-    entry: {
-        main: './src/index.js',
-        friendsfilter: './src/ff.js'
-    },
+    entry: './src/index.js',
+
     output: {
         filename: '[name].[hash].js',
         path: path.resolve('dist')
     },
     devtool: 'source-map',
     module: {
-        loaders: [
-            {
-                test: /\.hbs$/, 
-                loader: 'handlebars-loader'
-            }
-        ]
+        loaders
     },
     plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            sourceMap: true,
-            compress: {
-                drop_debugger: false
-            }
-        }),
+        // new webpack.optimize.UglifyJsPlugin({
+        //     sourceMap: true,
+        //     compress: {
+        //         drop_debugger: false
+        //     }
+        // }),
         new ExtractTextPlugin('styles.css'),
-        new HtmlPlugin({
-            title: 'main',
-            template: 'index.hbs',
-            chunks: ['main']
-        }),
+
         new HtmlPlugin({
             title: 'Другофильтр',
-            template: 'friendsfilter.hbs',
-            chunks: ['friendsfilter']
+            template: 'index.hbs'
         }),
+
         new CleanWebpackPlugin(['dist'])
     ]
 };
