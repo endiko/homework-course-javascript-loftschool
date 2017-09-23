@@ -14,6 +14,11 @@
         width: 620px;
         margin: auto;
     }
+
+    .wrapper {
+        background: #f0f0f0;
+    }
+
 {{!-- header --}}
 
     .top__block {
@@ -74,6 +79,17 @@
 
 {{!-- header end --}}
 
+{{!-- main content --}}
+
+    .main__content {
+        display: flex;
+    }
+
+    .friends_list__wrapper {
+        flex-basis: 50%;
+        padding: 13px 14px;
+        background: #fff;
+    }
 
 </style>
 
@@ -96,15 +112,22 @@
                     <input type="text" name="input_right" id="input_right" class="input_field" placeholder="Начните вводить имя друга">
                 </label>
             </div>
-            <div class="friends_list__wrapper">
-                <ul class="friends__list" id="res">
-                    {{> "./list.hbs"}}>
-                </ul>
-            </div>
+            <div class="main__content">
+                <div class="friends_list__wrapper">
+                    <div class="friend_list__title">Ваши друзья</div>
+                    <ul class="friends__list" id="res">
+                        {{> "./list.hbs"}}>
+                    </ul>
+                </div>
 
-            <div class="friends_list__wrapper">
+                <div class="friends_list__wrapper">
+                    <div class="friend_list__title">Друзья в списке</div>
+                    <ul class="friends__list">
 
+                    </ul>
+                </div>
             </div>
+            
         </div> 
     </div>
 </main>
