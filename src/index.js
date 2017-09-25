@@ -1,3 +1,5 @@
+import './style.css';
+
 const render = require('./list.hbs');
 const html = render();
 
@@ -33,18 +35,76 @@ promise
     })
     .then(data => {
         const [user] = data;
-       // const headerInfo = document.querySelector('#headerInfo');
 
-       // headerInfo.innerText = `Друзья на странице ${user.first_name} ${user.last_name}`;
-
-        return api('friends.get', { v: 5.68, fields: 'first_name, last_name, photo_100' , count: 3});
+        return api('friends.get', { v: 5.68, fields: 'first_name, last_name, photo_100', count: 15 });
     })
     .then(data => {
         const template = render({ list: data.items }),
-            res = document.querySelector('#res');
+            res = document.querySelector('#draggableContainer');
 
         res.innerHTML = template;
     })
     .catch((e) => {
         alert('Ошибка: ' + e.message);
     })
+
+/* Drag and Drop */
+
+let ul = document.querySelector('#draggableContainer');
+let selectedItem,
+    targetItem = null;
+
+ul.addEventListener('mousedown', (e) => {
+    let targetli = e.target;
+    
+    while (targetli != ul) {
+        if (targetli.tagName == 'LI') {
+            highlightItem(targetli);
+
+            return;
+        }
+        targetli = targetli.parentNode;
+    }
+});
+
+document.addEventListener('dragstart', (e) => {
+    targetItem = e.target;
+    e.dataTransfer.setData('text/html', '');
+  
+    return false;
+});
+      
+document.addEventListener('dragover', (e) => {
+    if (targetItem) {
+        e.preventDefault();
+    }
+    
+    return false;
+});
+  
+document.addEventListener('drop', (e) => {
+    if (e.target.getAttribute('data-draggable') == 'target') {
+        e.target.appendChild(targetItem);
+        
+        e.preventDefault();
+    }
+    
+    return false;
+});
+      
+document.addEventListener('dragend', (e) => {
+    targetItem = null;
+    
+    return false;
+});
+
+function highlightItem(node) {
+    if (selectedItem) {
+        selectedItem.classList.remove('active');
+    }
+
+    selectedItem = node;
+    selectedItem.classList.add('active');
+    
+}
+

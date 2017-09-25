@@ -1,105 +1,11 @@
-<style>
-    html, body {
-        margin: 0;
-        padding: 0;
-    }
-
-    ul, li {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-    }
-
-    .container {
-        width: 620px;
-        margin: auto;
-    }
-
-    .wrapper {
-        background: #f0f0f0;
-    }
-
-{{!-- header --}}
-
-    .top__block {
-        background: #ff8663;
-        padding: 13px;
-        border-radius: 8px 8px 0 0;
-        font-size: 16px;
-        font-weight: 500;
-        color: #fff;
-        position: relative;
-    }
-
-    .close_btn__icon {
-        background: url('../img/icons/close-btn.png') 50% 50% no-repeat;
-        width: 14px;
-        height: 14px;
-        display: inline-block;
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-
-    .search__block {
-        background: #f0f0f0;
-        padding: 10px 15px;
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .input_label {
-        display: inline-block;
-        position: relative;
-
-        &:after {
-            content: '\f002';
-            font-family: 'fontawesome';
-            position: absolute;
-            font-size: 14px;
-            color: #9f9f9f;
-            top: 50%;
-            left: 7px;
-            transform: translateY(-50%);
-        }
-    }
-
-    .input_field {
-        width: 260px;
-        height: 25px;
-        border-radius: 13px;
-        outline: 0;
-        border: 0;
-        padding: 0 0 0 25px;
-        font-size: 12px;
-        color: #9f9f9f;
-        font-weight: 400;
-    }
-
-{{!-- header end --}}
-
-{{!-- main content --}}
-
-    .main__content {
-        display: flex;
-    }
-
-    .friends_list__wrapper {
-        flex-basis: 50%;
-        padding: 13px 14px;
-        background: #fff;
-    }
-
-</style>
-
-<header class="header">
-    
-</header>
-
-<main class="main">
-    <div class="container">
-        <div class="wrapper">
+<div class="wrapper">
+    <main class="main">
+        <div class="container">
+            <header class="header">
+                <div class="logo__wrapper">
+                    <img src="./src/img/content/logo.png" class="image logo" alt="{{htmlWebpackPlugin.options.title}}">
+                </div>
+            </header>
             <div class="top__block">
                 <span class="top_header__text"> Выберите друзей </span>
                 <i class="close_btn__icon"></i>
@@ -115,20 +21,23 @@
             <div class="main__content">
                 <div class="friends_list__wrapper">
                     <div class="friend_list__title">Ваши друзья</div>
-                    <ul class="friends__list" id="res">
+                    <ul class="friends__list" id="draggableContainer">
                         {{> "./list.hbs"}}>
                     </ul>
                 </div>
 
                 <div class="friends_list__wrapper">
                     <div class="friend_list__title">Друзья в списке</div>
-                    <ul class="friends__list">
+                    <ul class="friends__list" id="dropContainer" data-draggable="target">
 
                     </ul>
                 </div>
             </div>
-            
-        </div> 
-    </div>
-</main>
+            <div class="bottom__block">
+                <button class="save__btn">Сохранить</button>
+            </div>
+        </div>
+    </main>
+</div>
+    
     

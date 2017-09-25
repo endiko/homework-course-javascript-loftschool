@@ -1,10 +1,11 @@
 {{#each list}}
-    <li class="friend__item">
+    <li class="friend__item" data-draggable="dragMe" draggable="true">
         <div class="friend_photo__wrapper">
-            <img src="{{photo_100}}" alt="{{first_name}} {{last_name}}">
+            <img src="{{photo_100}}" class="image friend__photo" alt="{{first_name}} {{last_name}}">
         </div>
-        <div class="friend__info">
+        <div class="friend__name">
             {{first_name}} {{last_name}}
         </div>
+        <i class="add_to_list__icon"></i>
     </li>
 {{/each}}
