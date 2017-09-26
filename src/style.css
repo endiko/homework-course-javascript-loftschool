@@ -143,16 +143,26 @@ ul, li {
     background: #f0f0f0;
 }
 
-.add_to_list__icon {
-    background: url('./img/icons/add-to-list.png') 50% 50% no-repeat;
-    width: 16px;
-    height: 16px;    
+.item__icon {
+      
     position: absolute;
-    display: block;
+    display: inline-block;
     top: 50%;
     transform: translateY(-50%);
     right: 13px;
     cursor: pointer;
+}
+
+.add__icon {
+    background: url('./img/icons/add-to-list.png') 50% 50% no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.del__icon {
+    background: url('./img/icons/delete-from-list.png') 50% 50% no-repeat;
+    width: 14px;
+    height: 14px;
 }
 
 .friend_photo__wrapper {

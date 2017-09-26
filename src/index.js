@@ -1,7 +1,9 @@
 import './style.css';
 
-const render = require('./list.hbs');
+const render = require('./list.hbs'); 
 const html = render();
+
+let friendsStorage = [];
 
 function api(method, params) {
     return new Promise((resolve, reject) => {
@@ -43,6 +45,17 @@ promise
             res = document.querySelector('#draggableContainer');
 
         res.innerHTML = template;
+
+        // friendsStorage = data.items;
+        // let arr = [];
+        // console.log(friendsStorage);
+
+        // friendsStorage.forEach((item) => {
+        //     for(let key in item) {
+        //         console.log(key, item[key]);
+        //     }
+        //     //console.log(item.first_name, item.last_name, item.photo_100);
+        // })
     })
     .catch((e) => {
         alert('Ошибка: ' + e.message);
@@ -51,10 +64,36 @@ promise
 /* Drag and Drop */
 
 let ul = document.querySelector('#draggableContainer');
+let ulDrop = document.querySelector('#dropContainer');
+
 let selectedItem,
     targetItem = null;
 
+let getName;
+
+ul.addEventListener('click', (e) => {
+    selectedItem = e.target;
+
+    let res;
+
+    if (selectedItem.tagName === 'I') {
+        res = e.target.parentNode;
+        let getPhoto = res.querySelector('.friend__photo');
+        let getFriend = res.querySelector('.friend__name');
+
+        ulDrop.innerHTML = '<li class="friend__item">'+
+        '<div class="friend_photo__wrapper">'+
+            '<img src="'+getPhoto.src+'" class="image friend__photo" alt="">'+
+        '</div>'+
+        '<div class="friend__name">'+
+            getFriend.innerText+
+        '</div>'+
+        '<i class="item__icon del__icon"></i></li>'
+    }
+});
+
 ul.addEventListener('mousedown', (e) => {
+    
     let targetli = e.target;
     
     while (targetli != ul) {
@@ -70,7 +109,8 @@ ul.addEventListener('mousedown', (e) => {
 document.addEventListener('dragstart', (e) => {
     targetItem = e.target;
     e.dataTransfer.setData('text/html', '');
-  
+    getName = targetItem;
+
     return false;
 });
       
@@ -78,13 +118,17 @@ document.addEventListener('dragover', (e) => {
     if (targetItem) {
         e.preventDefault();
     }
-    
+
     return false;
 });
   
 document.addEventListener('drop', (e) => {
-    if (e.target.getAttribute('data-draggable') == 'target') {
-        e.target.appendChild(targetItem);
+    //console.log(getName);
+    targetItem = e.target;
+    let dropTarget = targetItem.querySelector('#dropContainer');
+
+    if (dropTarget.getAttribute('data-draggable') == 'target') {
+        dropTarget.appendChild(getName);
         
         e.preventDefault();
     }
@@ -93,6 +137,7 @@ document.addEventListener('drop', (e) => {
 });
       
 document.addEventListener('dragend', (e) => {
+    //console.log(friendsStorage);
     targetItem = null;
     
     return false;
