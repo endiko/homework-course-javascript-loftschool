@@ -39,9 +39,6 @@ let homeworkContainer = document.querySelector('#homework-container'),
     addButton = homeworkContainer.querySelector('#add-button'),
     listTable = homeworkContainer.querySelector('#list-table tbody');
 
-// let allCookies,
-//     arr = [];
-
 let cookiesStorage = {};
 
 let cookieName,
@@ -49,90 +46,48 @@ let cookieName,
     filterName;
 
 window.addEventListener('load', () => {
-   // cookiesStorage = getCookies();
-
+    cookiesStorage = getCookies();
     renderTable(cookiesStorage);
-
-    // allCookies = document.cookie.split('; ');
-    // allCookies.forEach(cookie => arr.push(cookie.split('=')));
-
-    // for (let i = 0; i < arr.length; i++) {
-    //     let tr = document.createElement('tr');
-
-    //     tr.innerHTML = '<td>'+arr[i][0]+'</td><td>'+arr[i][1]+'</td><td><button>Удалить</button></td>';
-    //     listTable.appendChild(tr);
-
-    //     let delButton = tr.querySelector('button');
-        
-    //     delButton.addEventListener('click', (e) => {
-    //         deleteCookie(e.target.parentNode.parentNode.firstElementChild.innerText);
-    //         e.target.parentNode.parentNode.remove('tr');
-    //     });
-    // }
+    
 });
 
 filterNameInput.addEventListener('keyup', function() {
+    cookiesStorage = getCookies();
+
     filterName = filterNameInput.value;
 
-    let arrValues = Object.values(cookiesStorage);
-    let arrKeys = Object.keys(cookiesStorage);
-
-    let newCookieStorage = {};
-
-    let resKeys = arrKeys.filter(item => {
-        return isMatching(item, filterName);
-    });
-
-    let resValues = arrValues.filter(item => {
-        return isMatching(item, filterName);
-    });
-
-    console.log(resKeys, resValues);
+    filtering (cookiesStorage, filterName);
 });
 
 addButton.addEventListener('click', () => {
     cookieName = addNameInput.value,
     cookieVal = addValueInput.value;
+    filterName = filterNameInput.value;
 
-    for (let key in cookiesStorage) {
-        if (key == cookieName) {
-            updateTable(cookiesStorage, key, cookieVal);
-        } else {
-            createCookie(cookieName, cookieVal);
+    if (filterName === '') {
+        for (let key in cookiesStorage) {
+            if (key == cookieName) {
+                updateTable(cookiesStorage, key, cookieVal);
+            } else {
+                createCookie(cookieName, cookieVal);
+            }
         }
+        cookiesStorage = getCookies();
+        renderTable(cookiesStorage);
+    } else {
+        if (isMatching(cookieName, filterName) || isMatching(cookieVal, filterName)) {
+            createCookie(cookieName, cookieVal);
+            cookiesStorage = getCookies();
+            filtering (cookiesStorage, filterName);
+
+        }
+        createCookie(cookieName, cookieVal);
     }
-
-    renderTable(cookiesStorage);
-
-//     let tr = document.createElement('tr');
-
-//     let cookieObj = listTable.querySelectorAll('tr');
-
-//    // console.log(cookieObj);
-
-//     for (let i=0; i< cookieObj.length; i++) {
-        
-//         if (cookieObj[i].firstElementChild.innerText !== cookieName) {
-//             createCookie(cookieName, cookieVal);
-//         } else {
-//             cookieObj[i].children[1].innerText = cookieVal;
-//         }
-//     }
-    
-//     tr.innerHTML = '<td>'+cookieName+'</td><td>'+cookieVal+'</td><td><button>Удалить</button></td>';
-//     listTable.appendChild(tr);
-
-//     let delButton = tr.querySelector('button');
-
-//     delButton.addEventListener('click', (e) => {
-//         deleteCookie(e.target.parentNode.parentNode.firstElementChild.innerText);
-//         e.target.parentNode.parentNode.remove('tr');
-//     });
 });
 
 function getCookies() {
     let cookies = document.cookie.split('; ');
-
+    
     cookies.forEach(cookie => { 
         let val = cookie.split('=');
         
@@ -144,13 +99,13 @@ function getCookies() {
 
 function renderTable(obj) {
     listTable.innerHTML = '';
-    obj = getCookies();
-
     for (let key in obj) {
         let tr = document.createElement('tr');
 
-        tr.innerHTML = '<td>'+key+'</td><td>'+obj[key]+'</td><td><button>Удалить</button></td>';
-        listTable.appendChild(tr);
+        if (key !== '' && obj[key] !== 'undefined') {
+            tr.innerHTML = '<td>'+key+'</td><td>'+obj[key]+'</td><td><button>Удалить</button></td>';
+            listTable.appendChild(tr);
+        } 
     }
     
     listTable.addEventListener('click', (e) => {
@@ -165,6 +120,35 @@ function renderTable(obj) {
 function updateTable(obj, objKey, newVal) {
     obj[objKey] = newVal;
     createCookie(objKey, obj[objKey]);
+}
+
+function filtering (obj, filterValue) {
+    let newObj = {};
+    let arrValues = Object.values(obj);
+    let arrKeys = Object.keys(obj);
+
+    let resKeys = arrKeys.filter(item => {
+        return isMatching(item, filterValue);
+    });
+
+    let resValues = arrValues.filter(item => {
+        return isMatching(item, filterValue);
+    });
+
+    for (let key in obj) {
+        for (let i = 0; i < resKeys.length; i++) {
+            if (resKeys[i] == key) {
+                newObj[resKeys[i]] = obj[key];
+            }
+        }
+        for (let i = 0; i < resValues.length; i++) {
+            if (resValues[i] == obj[key]) {
+                newObj[key] = resValues[i];
+            }
+        }
+    }
+
+    renderTable(newObj);
 }
 
 function createCookie (name, value) {
