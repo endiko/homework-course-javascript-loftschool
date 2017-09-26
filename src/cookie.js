@@ -41,51 +41,30 @@ let homeworkContainer = document.querySelector('#homework-container'),
 
 let cookiesStorage = {};
 
-let cookieName,
-    cookieVal,
-    filterName;
-
 window.addEventListener('load', () => {
-    cookiesStorage = getCookies();
+    getCookies();    
     renderTable(cookiesStorage);
-    
 });
 
 filterNameInput.addEventListener('keyup', function() {
-    cookiesStorage = getCookies();
-
-    filterName = filterNameInput.value;
-
-    filtering (cookiesStorage, filterName);
+    renderFiltered();
 });
 
 addButton.addEventListener('click', () => {
-    cookieName = addNameInput.value,
-    cookieVal = addValueInput.value;
-    filterName = filterNameInput.value;
 
-    if (filterName === '') {
-        for (let key in cookiesStorage) {
-            if (key == cookieName) {
-                updateTable(cookiesStorage, key, cookieVal);
-            } else {
-                createCookie(cookieName, cookieVal);
-            }
-        }
-        cookiesStorage = getCookies();
-        renderTable(cookiesStorage);
-    } else {
-        if (isMatching(cookieName, filterName) || isMatching(cookieVal, filterName)) {
-            createCookie(cookieName, cookieVal);
-            cookiesStorage = getCookies();
-            filtering (cookiesStorage, filterName);
+    let cookieName = addNameInput.value,
+        cookieVal = addValueInput.value;
 
-        }
-        createCookie(cookieName, cookieVal);
-    }
+    cookiesStorage[cookieName] = cookieVal;
+
+    createCookie(cookieName, cookieVal);
+    renderFiltered();
 });
 
 function getCookies() {
+    if (document.cookie === '') {
+        return;
+    }
     let cookies = document.cookie.split('; ');
     
     cookies.forEach(cookie => { 
@@ -93,8 +72,6 @@ function getCookies() {
         
         cookiesStorage[val[0]] = val[1];
     });
-
-    return cookiesStorage;
 }
 
 function renderTable(obj) {
@@ -110,22 +87,27 @@ function renderTable(obj) {
     
     listTable.addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
-            deleteCookie(e.target.parentNode.parentNode.firstElementChild.innerText);
-            e.target.parentNode.parentNode.remove('tr');
+            let key = e.target.parentNode.parentNode.firstElementChild.innerText;
+
+            delete cookiesStorage[key];
+            deleteCookie(key);
+            renderFiltered();
         }
-        
     });
 }
 
-function updateTable(obj, objKey, newVal) {
-    obj[objKey] = newVal;
-    createCookie(objKey, obj[objKey]);
-}
+function renderFiltered() {
+    let filterValue = filterNameInput.value;
 
-function filtering (obj, filterValue) {
+    if (filterValue === '') {
+        renderTable(cookiesStorage);
+
+        return;
+    }
+
     let newObj = {};
-    let arrValues = Object.values(obj);
-    let arrKeys = Object.keys(obj);
+    let arrValues = Object.values(cookiesStorage);
+    let arrKeys = Object.keys(cookiesStorage);
 
     let resKeys = arrKeys.filter(item => {
         return isMatching(item, filterValue);
@@ -135,14 +117,14 @@ function filtering (obj, filterValue) {
         return isMatching(item, filterValue);
     });
 
-    for (let key in obj) {
+    for (let key in cookiesStorage) {
         for (let i = 0; i < resKeys.length; i++) {
             if (resKeys[i] == key) {
-                newObj[resKeys[i]] = obj[key];
+                newObj[resKeys[i]] = cookiesStorage[key];
             }
         }
         for (let i = 0; i < resValues.length; i++) {
-            if (resValues[i] == obj[key]) {
+            if (resValues[i] == cookiesStorage[key]) {
                 newObj[key] = resValues[i];
             }
         }
@@ -155,14 +137,13 @@ function createCookie (name, value) {
     let date = new Date();
 
     date.setYear(2018);
-
-    return document.cookie = name+'='+value+'; expires='+date.toString();
+    document.cookie = name+'='+value+'; expires='+date.toString();
 }
 
 function deleteCookie (name) {
     let date = new Date(0);
     
-    return document.cookie = name+'= '+'; expires='+date.toString();
+    document.cookie = name+'= '+'; expires='+date.toString();
 }
 
 function isMatching(full, chunk) {
