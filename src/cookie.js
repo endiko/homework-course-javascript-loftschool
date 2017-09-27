@@ -47,16 +47,9 @@ window.addEventListener('load', () => {
 });
 
 filterNameInput.addEventListener('keyup', function() {
-    if (filterNameInput.value) {
-        cookiesStorage = {};
-        getCookies();
-        renderFiltered();
-    } else {
-        cookiesStorage = {};
-        getCookies();
-        renderTable(cookiesStorage);
-    }
-    
+    cookiesStorage= {};
+    getCookies();
+    renderFiltered();
 });
 
 addButton.addEventListener('click', () => {
