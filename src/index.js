@@ -15,8 +15,8 @@ let ul = document.querySelector('#draggableContainer'),
 
 let friendsStorage = {};
 
-let leftArr = [],
-    rightArr = [];
+let friendsStorageLeft = [],
+    friendsStorageRight = [];
 
 function api(method, params) {
     return new Promise((resolve, reject) => {
@@ -55,61 +55,28 @@ promise
     })
     .then(data => {
         const template = render({ list: data.items });
+        let getLeftData = JSON.parse(localStorage.leftdata || '[]');
+        let getRightData = JSON.parse(localStorage.rightdata || '[]');
 
-        ul.innerHTML = template;
         friendsStorage = data.items;
-    })
-    .then(data => {
-        document.addEventListener('dragstart', (e) => {
-            targetItem = e.target;
-            e.dataTransfer.setData('text/html', '');
-            getName = targetItem;
 
-            getFriend = getName.querySelector('.friend__name');
-
-            leftArr.forEach(item => {
-                if (isMatching(item.first_name+ ' ' + item.last_name, getFriend.innerText)) {
-                    addItem(rightArr, item);
-                    removeItem(leftArr, item);
-                }
+        if (localStorage.length > 1) {
+            getLeftData.forEach(item => {
+                friendsStorageLeft = getLeftData;
+                renderList(item, ul, 'add__icon');
             })
-        
-            return false;
-        });
-              
-        document.addEventListener('dragover', (e) => {
-            if (targetItem) {
-                e.preventDefault();
-            }
-        
-            return false;
-        });
-          
-        document.addEventListener('drop', (e) => {
-            targetItem = e.target;
-            let dropTarget = targetItem.querySelector('#dropContainer'),
-                changeIcon = getName.querySelector('.item__icon');
-        
-            changeIcon.classList.remove('add__icon');
-            changeIcon.classList.add('del__icon');
-        
-            if (dropTarget.getAttribute('data-draggable') == 'target') {
-                dropTarget.appendChild(getName);
-                e.preventDefault();
-            }
-        
-            return false;
-        });
-              
-        document.addEventListener('dragend', () => {
-            targetItem = null;
-            
-            return false;
-        });
-    })
-    .then(data => {
-        leftArr = friendsStorage;
 
+            getRightData.forEach(item => {
+                friendsStorageRight = getRightData;
+                renderList(item, ulDrop, 'del__icon');
+            })
+        } else {
+            friendsStorageLeft = friendsStorage;
+            friendsStorageRight = [];
+            ul.innerHTML = template;
+        }
+    })
+    .then(data => {    
         ul.addEventListener('click', (e) => {
             selectedItem = e.target;
             
@@ -117,42 +84,92 @@ promise
                 resParent = e.target.parentNode;
                 getFriend = resParent.querySelector('.friend__name');
 
-                leftArr.forEach((item) => {
+                friendsStorageLeft.forEach(item => {
                     if (isMatching(item.first_name + ' ' + item.last_name, getFriend.innerText)) {
-                        addItem(rightArr, item);
-                        removeItem(leftArr, item);
+                        addItem(friendsStorageRight, item);
+                        removeItem(friendsStorageLeft, item);
                         renderList(item, ulDrop, 'del__icon');
                         ul.removeChild(resParent);
                     }
                 });
             }
-
-            ulDrop.addEventListener('click', (e) => {
-                selectedItem = e.target;
-                
-                if (selectedItem.tagName === 'I') {
-                    resParent = e.target.parentNode;
-                    getFriend = resParent.querySelector('.friend__name');
-    
-                    rightArr.forEach((item) => {
-                        if (isMatching(item.first_name + ' ' + item.last_name, getFriend.innerText)) {
-                            addItem(leftArr, item);
-                            removeItem(rightArr, item);
-                            
-                            renderList(item, ul, 'add__icon');
-                            ulDrop.removeChild(resParent);
-                        }
-                    });
-                }
-            });
         });
     })
     .then(data => {
-        let arr = [];
+        ulDrop.addEventListener('click', (e) => {
+            selectedItem = e.target;
 
+            if (selectedItem.tagName === 'I') {
+                resParent = e.target.parentNode;
+                getFriend = resParent.querySelector('.friend__name');
+                
+                friendsStorageRight.forEach(item => {
+                    if (isMatching(item.first_name + ' ' + item.last_name, getFriend.innerText)) {
+                        addItem(friendsStorageLeft, item);
+                        removeItem(friendsStorageRight, item);
+                        
+                        renderList(item, ul, 'add__icon');
+                        ulDrop.removeChild(resParent);
+                    }
+                });
+            }
+        });
+    })
+    .then(data => {
+        document.addEventListener('dragstart', (e) => {
+            targetItem = e.target;
+            e.dataTransfer.setData('text/html', '');
+            getName = targetItem;
+            getFriend = getName.querySelector('.friend__name');
+
+            friendsStorageLeft.forEach(item => {
+                if (isMatching(item.first_name+ ' ' + item.last_name, getFriend.innerText)) {
+                    addItem(friendsStorageRight, item);
+                    removeItem(friendsStorageLeft, item);
+                }
+            })
+        
+            return false;
+        });
+    })
+    .then(data => {          
+        document.addEventListener('dragover', (e) => {
+            if (targetItem) {
+                e.preventDefault();
+            }
+        
+            return false;
+        });
+    })
+    .then(data => {         
+        document.addEventListener('drop', (e) => {
+            targetItem = e.target;
+            let dropTarget = targetItem.querySelector('#dropContainer'),
+                changeIcon = getName.querySelector('.item__icon');
+        
+            if (dropTarget.getAttribute('data-draggable') === 'target') {
+                dropTarget.appendChild(getName);
+                changeIcon.classList.remove('add__icon');
+                changeIcon.classList.add('del__icon');
+                e.preventDefault();
+            }
+        
+            return false;
+        });
+    })
+    .then(data => {             
+        document.addEventListener('dragend', () => {
+            targetItem = null;
+            
+            return false;
+        });
+    })
+    .then(data => {
         inputLeft.addEventListener('keyup', () => {
+            let arr = [];
+
             ul.innerHTML = '';
-            arr = leftArr.filter(item => {
+            arr = friendsStorageLeft.filter(item => {
                 return isMatching(item.first_name +' ' + item.last_name, inputLeft.value);
             })
             
@@ -160,16 +177,31 @@ promise
                 renderList(item, ul, 'add__icon');
             })
         })
-
+    })
+    .then(data => {
         inputRight.addEventListener('keyup', () => {
+            let arr = [];
+
             ulDrop.innerHTML = '';
-            arr = rightArr.filter(item => {
+            arr = friendsStorageRight.filter(item => {
                 return isMatching(item.first_name +' ' + item.last_name, inputRight.value);
             })
             
             arr.forEach(item => {
                 renderList(item, ulDrop, 'del__icon');
             })
+        })
+    })
+    .then(data => {
+        let saveButton = document.querySelector('#saveButton');
+        
+        saveButton.addEventListener('click', () => {
+            if (confirm ('Подтвердите сохранение')) {
+                localStorage.leftdata = JSON.stringify(friendsStorageLeft);
+                localStorage.rightdata = JSON.stringify(friendsStorageRight);
+            } else {
+                return;
+            }
         })
     })
     .catch((e) => {
