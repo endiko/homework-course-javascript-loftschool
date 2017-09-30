@@ -171,8 +171,8 @@ promise
     .then(data => {
         document.addEventListener('dragstart', (e) => {
             targetItem = e.target;
+            getName = (targetItem.tagName === 'IMG') ? targetItem.parentNode.parentNode : targetItem;
             e.dataTransfer.setData('text/html', '');
-            getName = targetItem;
 
             return false;
         });
@@ -197,34 +197,35 @@ promise
                 dropTarget = targetItem.querySelector('#dropContainer');
                 addDelFriend(friendsStorageLeft, ulDrop);
                 ul.removeChild(getName);
-                console.log('toR', friendsStorageLeft, friendsStorageRight);
         
             } else if (targetItem.querySelector('#draggableContainer')) {
                 dropTarget = targetItem.querySelector('#draggableContainer');
                 addDelFriend(friendsStorageRight, ul);
                 ulDrop.removeChild(getName);
-                console.log('toL', friendsStorageLeft, friendsStorageRight);
             } else {
-                if (targetItem.parentNode.tagName === 'UL') {
-                    let newTarget = targetItem.parentNode;
+                let newTarget;
 
-                    if (newTarget.getAttribute('id') === 'dropContainer') {
-                        dropTarget = newTarget;
-                        if (getName.parentNode !== dropTarget) {
-                            addDelFriend(friendsStorageLeft, ulDrop);
-                            ul.removeChild(getName);
-                        }
+                if (targetItem.parentNode.tagName === 'UL') {
+                    newTarget = targetItem.parentNode;
+                } else if (targetItem.parentNode.tagName === 'LI') {
+                    newTarget = targetItem.parentNode.parentNode;
+                } else if (targetItem.tagName === 'IMG') {
+                    newTarget = targetItem.parentNode.parentNode.parentNode;
+                }
+                if (newTarget.getAttribute('id') === 'dropContainer') {
+                    dropTarget = newTarget;
+                    if (getName.parentNode !== dropTarget) {
                         addDelFriend(friendsStorageLeft, ulDrop);
-                        console.log('subtoR', dropTarget, friendsStorageLeft, friendsStorageRight);
-                    } else if (newTarget.getAttribute('id') === 'draggableContainer') {
-                        dropTarget = newTarget;
-                        if (getName.parentNode !== dropTarget) {
-                            ulDrop.removeChild(getName);
-                            addDelFriend(friendsStorageRight, ul);
-                        }
-                        addDelFriend(friendsStorageRight, ul);
-                        console.log('subToL', dropTarget, friendsStorageLeft, friendsStorageRight);
+                        ul.removeChild(getName);
                     }
+                    addDelFriend(friendsStorageLeft, ulDrop);
+                } else if (newTarget.getAttribute('id') === 'draggableContainer') {
+                    dropTarget = newTarget;
+                    if (getName.parentNode !== dropTarget) {
+                        ulDrop.removeChild(getName);
+                        addDelFriend(friendsStorageRight, ul);
+                    }
+                    addDelFriend(friendsStorageRight, ul);
                 }
             }
             
@@ -241,13 +242,11 @@ promise
     .then(data => {
         inputLeft.addEventListener('keyup', () => {
             filterFriends(friendsStorageLeft, ul);
-            console.log('filter', friendsStorageLeft, friendsStorageRight);
         })
     })
     .then(data => {
         inputRight.addEventListener('keyup', () => {
             filterFriends(friendsStorageRight, ulDrop);
-            console.log('filter', friendsStorageLeft, friendsStorageRight);
         })
     })
     .then(data => {
