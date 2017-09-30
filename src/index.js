@@ -30,6 +30,70 @@ function api(method, params) {
     });
 }
 
+function isMatching(full, chunk) {
+    return (full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1); 
+}
+
+function addItem(array, item) {
+    return array.push(item);
+}
+
+function removeItem(array, item) {
+    const index = array.indexOf(item);
+
+    if (index !== -1) {
+        array.splice(index, 1);
+    }
+}
+
+function renderFriend(obj, targetList, icon) {
+    let li = document.createElement('li');
+    
+    li.classList.add('friend__item');
+    li.setAttribute('data-draggable', 'dragMe');
+    li.setAttribute('draggable', 'true');
+    li.innerHTML = '<div class="friend_photo__wrapper">'+
+                        '<img src="'+obj.photo_100+'" class="image friend__photo" alt="">'+
+                    '</div>'+
+                    '<div class="friend__name">' + obj.first_name + ' ' + obj.last_name + '</div>'+
+                    '<i class="item__icon ' + icon + '"></i>';
+    targetList.appendChild(li);
+}
+
+function addDelFriend(objFrom, objTo, friend) {
+    objFrom.forEach(item => {
+        if (isMatching(item.first_name+ ' ' + item.last_name, friend.innerText)) {
+            addItem(objTo, item);
+            removeItem(objFrom, item);
+            if (objTo === friendsStorageRight) {
+                renderFriend(item, ulDrop, 'del__icon');
+            } else {
+                renderFriend(item, ul, 'add__icon');
+            }
+        }
+    })
+}
+
+function filterFriends(obj, input, targetList) {
+    targetList.innerHTML = '';
+    let arr = [];
+
+    if (input.value === '') {
+        arr = obj;
+    } else {
+        arr = obj.filter(item => {
+            return isMatching(item.first_name +' ' + item.last_name, input.value);
+        })
+    }
+    
+    arr.forEach(item => {
+        let icon;
+
+        icon = (targetList === ul) ? 'add__icon' : 'del__icon';
+        renderFriend(item, targetList, icon);
+    })
+}
+
 const promise = new Promise((resolve, reject) => {
     VK.init({
         apiId: 6192452
@@ -63,12 +127,11 @@ promise
         if (localStorage.length > 1) {
             getLeftData.forEach(item => {
                 friendsStorageLeft = getLeftData;
-                renderList(item, ul, 'add__icon');
+                renderFriend(item, ul, 'add__icon');
             })
-
             getRightData.forEach(item => {
                 friendsStorageRight = getRightData;
-                renderList(item, ulDrop, 'del__icon');
+                renderFriend(item, ulDrop, 'del__icon');
             })
         } else {
             friendsStorageLeft = friendsStorage;
@@ -83,15 +146,10 @@ promise
             if (selectedItem.tagName === 'I') {
                 resParent = e.target.parentNode;
                 getFriend = resParent.querySelector('.friend__name');
+                addDelFriend(friendsStorageLeft, friendsStorageRight, getFriend);
+                ul.removeChild(resParent);
 
-                friendsStorageLeft.forEach(item => {
-                    if (isMatching(item.first_name + ' ' + item.last_name, getFriend.innerText)) {
-                        addItem(friendsStorageRight, item);
-                        removeItem(friendsStorageLeft, item);
-                        renderList(item, ulDrop, 'del__icon');
-                        ul.removeChild(resParent);
-                    }
-                });
+                console.log(friendsStorageLeft, friendsStorageRight)
             }
         });
     })
@@ -102,16 +160,10 @@ promise
             if (selectedItem.tagName === 'I') {
                 resParent = e.target.parentNode;
                 getFriend = resParent.querySelector('.friend__name');
-                
-                friendsStorageRight.forEach(item => {
-                    if (isMatching(item.first_name + ' ' + item.last_name, getFriend.innerText)) {
-                        addItem(friendsStorageLeft, item);
-                        removeItem(friendsStorageRight, item);
-                        
-                        renderList(item, ul, 'add__icon');
-                        ulDrop.removeChild(resParent);
-                    }
-                });
+                addDelFriend(friendsStorageRight, friendsStorageLeft, getFriend);
+                ulDrop.removeChild(resParent);
+
+                console.log(friendsStorageRight, friendsStorageLeft)
             }
         });
     })
@@ -120,15 +172,7 @@ promise
             targetItem = e.target;
             e.dataTransfer.setData('text/html', '');
             getName = targetItem;
-            getFriend = getName.querySelector('.friend__name');
 
-            friendsStorageLeft.forEach(item => {
-                if (isMatching(item.first_name+ ' ' + item.last_name, getFriend.innerText)) {
-                    addItem(friendsStorageRight, item);
-                    removeItem(friendsStorageLeft, item);
-                }
-            })
-        
             return false;
         });
     })
@@ -137,59 +181,80 @@ promise
             if (targetItem) {
                 e.preventDefault();
             }
-        
+
             return false;
         });
     })
     .then(data => {         
         document.addEventListener('drop', (e) => {
             targetItem = e.target;
-            let dropTarget = targetItem.querySelector('#dropContainer'),
-                changeIcon = getName.querySelector('.item__icon');
+            let dropTarget;
+            
+            getFriend = getName.querySelector('.friend__name');
+
+            if (getName.parentNode == targetItem.querySelector('#draggableContainer') ||
+                getName.parentNode == targetItem.querySelector('#dropContainer')) {
+                return;
+            } 
+
+            if (targetItem.querySelector('#dropContainer')) {
+                dropTarget = targetItem.querySelector('#dropContainer');
+                addDelFriend(friendsStorageLeft, friendsStorageRight, getFriend);
+                ul.removeChild(getName);
+                console.log('R', friendsStorageLeft, friendsStorageRight);
         
-            if (dropTarget.getAttribute('data-draggable') === 'target') {
-                dropTarget.appendChild(getName);
-                changeIcon.classList.remove('add__icon');
-                changeIcon.classList.add('del__icon');
-                e.preventDefault();
+            } else if (targetItem.querySelector('#draggableContainer')) {
+                dropTarget = targetItem.querySelector('#draggableContainer');
+                addDelFriend(friendsStorageRight, friendsStorageLeft, getFriend);
+                ulDrop.removeChild(getName);
+                console.log('L', friendsStorageLeft, friendsStorageRight);
+            } else {
+                if (targetItem.parentNode.tagName === 'UL') {
+                    let newTarget = targetItem.parentNode;
+
+                    if (newTarget.getAttribute('id') === 'dropContainer') {
+                        dropTarget = newTarget;
+                        if (getName.parentNode === dropTarget) {
+                            addDelFriend(friendsStorageLeft, friendsStorageRight, getFriend);
+                        } else {
+                            addDelFriend(friendsStorageLeft, friendsStorageRight, getFriend);
+                            ul.removeChild(getName);
+                        }
+                        
+                        console.log('Sub R', friendsStorageLeft, friendsStorageRight);
+                    } else if (newTarget.getAttribute('id') === 'draggableContainer') {
+                        dropTarget = newTarget;
+                        if (getName.parentNode === dropTarget) {
+                            addDelFriend(friendsStorageRight, friendsStorageLeft, getFriend);
+                        } else {
+                            addDelFriend(friendsStorageRight, friendsStorageLeft, getFriend);
+                            ulDrop.removeChild(getName);
+                        }
+                        console.log('Sub L', friendsStorageLeft, friendsStorageRight);
+                    }
+                }
             }
-        
+            
             return false;
         });
     })
     .then(data => {             
-        document.addEventListener('dragend', () => {
+        document.addEventListener('dragend', (e) => {
             targetItem = null;
-            
+
             return false;
         });
     })
     .then(data => {
         inputLeft.addEventListener('keyup', () => {
-            let arr = [];
-
-            ul.innerHTML = '';
-            arr = friendsStorageLeft.filter(item => {
-                return isMatching(item.first_name +' ' + item.last_name, inputLeft.value);
-            })
-            
-            arr.forEach(item => {
-                renderList(item, ul, 'add__icon');
-            })
+            filterFriends(friendsStorageLeft, inputLeft, ul);
+            console.log('filter', friendsStorageLeft, friendsStorageRight);
         })
     })
     .then(data => {
         inputRight.addEventListener('keyup', () => {
-            let arr = [];
-
-            ulDrop.innerHTML = '';
-            arr = friendsStorageRight.filter(item => {
-                return isMatching(item.first_name +' ' + item.last_name, inputRight.value);
-            })
-            
-            arr.forEach(item => {
-                renderList(item, ulDrop, 'del__icon');
-            })
+            filterFriends(friendsStorageRight, inputRight, ulDrop);
+            console.log('filter', friendsStorageLeft, friendsStorageRight);
         })
     })
     .then(data => {
@@ -208,32 +273,3 @@ promise
         alert('Ошибка: ' + e.message);
     })
 
-function isMatching(full, chunk) {
-    return (full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1); 
-}
-
-function addItem(array, item) {
-    return array.push(item);
-}
-
-function removeItem(array, item) {
-    const index = array.indexOf(item);
-
-    if (index !== -1) {
-        array.splice(index, 1);
-    }
-}
-
-function renderList(obj, targetList, icon) {
-    let li = document.createElement('li');
-    
-    li.classList.add('friend__item');
-    li.setAttribute('data-draggable', 'dragMe');
-    li.setAttribute('draggable', 'true');
-    li.innerHTML = '<div class="friend_photo__wrapper">'+
-                        '<img src="'+obj.photo_100+'" class="image friend__photo" alt="">'+
-                    '</div>'+
-                    '<div class="friend__name">' + obj.first_name + ' ' + obj.last_name + '</div>'+
-                    '<i class="item__icon ' + icon + '"></i>';
-    targetList.appendChild(li);
-}
