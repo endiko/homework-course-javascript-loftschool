@@ -57,27 +57,33 @@ function renderFriend(obj, targetList, icon) {
                     '</div>'+
                     '<div class="friend__name">' + obj.first_name + ' ' + obj.last_name + '</div>'+
                     '<i class="item__icon ' + icon + '"></i>';
+
     targetList.appendChild(li);
 }
 
-function addDelFriend(objFrom, objTo, friend) {
+function addDelFriend(objFrom, targetList) {
+    let objTo;
+
+    objTo = (objFrom === friendsStorageLeft) ? friendsStorageRight : friendsStorageLeft;
+
     objFrom.forEach(item => {
-        if (isMatching(item.first_name+ ' ' + item.last_name, friend.innerText)) {
+        if (isMatching(item.first_name+ ' ' + item.last_name, getFriend.innerText)) {
             addItem(objTo, item);
             removeItem(objFrom, item);
-            if (objTo === friendsStorageRight) {
-                renderFriend(item, ulDrop, 'del__icon');
-            } else {
-                renderFriend(item, ul, 'add__icon');
-            }
         }
     })
+
+    filterFriends(objFrom, targetList);
+    filterFriends(objTo, targetList);
 }
 
-function filterFriends(obj, input, targetList) {
+function filterFriends(obj, targetList) {
     targetList.innerHTML = '';
+
     let arr = [];
 
+    let input = (obj === friendsStorageLeft) ? inputLeft : inputRight;
+        
     if (input.value === '') {
         arr = obj;
     } else {
@@ -87,9 +93,8 @@ function filterFriends(obj, input, targetList) {
     }
     
     arr.forEach(item => {
-        let icon;
+        let icon = (targetList === ul) ? 'add__icon' : 'del__icon';
 
-        icon = (targetList === ul) ? 'add__icon' : 'del__icon';
         renderFriend(item, targetList, icon);
     })
 }
@@ -146,10 +151,8 @@ promise
             if (selectedItem.tagName === 'I') {
                 resParent = e.target.parentNode;
                 getFriend = resParent.querySelector('.friend__name');
-                addDelFriend(friendsStorageLeft, friendsStorageRight, getFriend);
+                addDelFriend(friendsStorageLeft, ulDrop);
                 ul.removeChild(resParent);
-
-                console.log(friendsStorageLeft, friendsStorageRight)
             }
         });
     })
@@ -160,10 +163,8 @@ promise
             if (selectedItem.tagName === 'I') {
                 resParent = e.target.parentNode;
                 getFriend = resParent.querySelector('.friend__name');
-                addDelFriend(friendsStorageRight, friendsStorageLeft, getFriend);
+                addDelFriend(friendsStorageRight, ul);
                 ulDrop.removeChild(resParent);
-
-                console.log(friendsStorageRight, friendsStorageLeft)
             }
         });
     })
@@ -192,45 +193,37 @@ promise
             
             getFriend = getName.querySelector('.friend__name');
 
-            if (getName.parentNode == targetItem.querySelector('#draggableContainer') ||
-                getName.parentNode == targetItem.querySelector('#dropContainer')) {
-                return;
-            } 
-
             if (targetItem.querySelector('#dropContainer')) {
                 dropTarget = targetItem.querySelector('#dropContainer');
-                addDelFriend(friendsStorageLeft, friendsStorageRight, getFriend);
+                addDelFriend(friendsStorageLeft, ulDrop);
                 ul.removeChild(getName);
-                console.log('R', friendsStorageLeft, friendsStorageRight);
+                console.log('toR', friendsStorageLeft, friendsStorageRight);
         
             } else if (targetItem.querySelector('#draggableContainer')) {
                 dropTarget = targetItem.querySelector('#draggableContainer');
-                addDelFriend(friendsStorageRight, friendsStorageLeft, getFriend);
+                addDelFriend(friendsStorageRight, ul);
                 ulDrop.removeChild(getName);
-                console.log('L', friendsStorageLeft, friendsStorageRight);
+                console.log('toL', friendsStorageLeft, friendsStorageRight);
             } else {
                 if (targetItem.parentNode.tagName === 'UL') {
                     let newTarget = targetItem.parentNode;
 
                     if (newTarget.getAttribute('id') === 'dropContainer') {
                         dropTarget = newTarget;
-                        if (getName.parentNode === dropTarget) {
-                            addDelFriend(friendsStorageLeft, friendsStorageRight, getFriend);
-                        } else {
-                            addDelFriend(friendsStorageLeft, friendsStorageRight, getFriend);
+                        if (getName.parentNode !== dropTarget) {
+                            addDelFriend(friendsStorageLeft, ulDrop);
                             ul.removeChild(getName);
                         }
-                        
-                        console.log('Sub R', friendsStorageLeft, friendsStorageRight);
+                        addDelFriend(friendsStorageLeft, ulDrop);
+                        console.log('subtoR', dropTarget, friendsStorageLeft, friendsStorageRight);
                     } else if (newTarget.getAttribute('id') === 'draggableContainer') {
                         dropTarget = newTarget;
-                        if (getName.parentNode === dropTarget) {
-                            addDelFriend(friendsStorageRight, friendsStorageLeft, getFriend);
-                        } else {
-                            addDelFriend(friendsStorageRight, friendsStorageLeft, getFriend);
+                        if (getName.parentNode !== dropTarget) {
                             ulDrop.removeChild(getName);
+                            addDelFriend(friendsStorageRight, ul);
                         }
-                        console.log('Sub L', friendsStorageLeft, friendsStorageRight);
+                        addDelFriend(friendsStorageRight, ul);
+                        console.log('subToL', dropTarget, friendsStorageLeft, friendsStorageRight);
                     }
                 }
             }
@@ -247,13 +240,13 @@ promise
     })
     .then(data => {
         inputLeft.addEventListener('keyup', () => {
-            filterFriends(friendsStorageLeft, inputLeft, ul);
+            filterFriends(friendsStorageLeft, ul);
             console.log('filter', friendsStorageLeft, friendsStorageRight);
         })
     })
     .then(data => {
         inputRight.addEventListener('keyup', () => {
-            filterFriends(friendsStorageRight, inputRight, ulDrop);
+            filterFriends(friendsStorageRight, ulDrop);
             console.log('filter', friendsStorageLeft, friendsStorageRight);
         })
     })
